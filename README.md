@@ -1,3 +1,3 @@
 # Online FTXUI Code Generator
 
-![Code Generator Demo](/assets/Demo.webm "Code Generator Demo")
+![Code Generator Demo](/assets/Demo.gif "Code Generator Demo")
