@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FTXUI 代码生成器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .component {
+            cursor: move;
+            transition: all 0.2s ease;
+        }
+        .component:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .workspace {
+            min-height: 400px;
+            background-color: #f8fafc;
+            border: 2px dashed #cbd5e1;
+            transition: all 0.3s ease;
+        }
+        .workspace.highlight {
+            border-color: #60a5fa;
+            background-color: #ebf5ff;
+        }
+        .code-block {
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap;
+            background-color: #1e293b;
+            color: #f8fafc;
+            border-radius: 0.5rem;
+        }
+        .component-preview {
+            border: 1px solid #e2e8f0;
+            padding: 0.5rem;
+            margin: 0.25rem 0;
+            background-color: white;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-3xl font-bold text-center text-blue-700 mb-2">FTXUI 代码生成器</h1>
+        <p class="text-center text-gray-600 mb-8">通过拖拽组件生成C++ FTXUI界面代码</p>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- 组件面板 -->
+            <div class="bg-white p-4 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">组件库</h2>
+                <div id="components" class="space-y-3">
+                    <div class="component bg-blue-50 p-3 rounded-lg border border-blue-200" data-type="button" draggable="true">
+                        <div class="flex items-center">
+                            <i class="fas fa-square mr-2 text-blue-500"></i>
+                            <span class="font-medium">按钮</span>
+                        </div>
+                        <div class="component-preview mt-2">
+                            <button class="px-3 py-1 bg-blue-500 text-white rounded">按钮</button>
+                        </div>
+                    </div>
+                    
+                    <div class="component bg-green-50 p-3 rounded-lg border border-green-200" data-type="input" draggable="true">
+                        <div class="flex items-center">
+                            <i class="fas fa-keyboard mr-2 text-green-500"></i>
+                            <span class="font-medium">输入框</span>
+                        </div>
+                        <div class="component-preview mt-2">
+                            <input type="text" class="border px-2 py-1 rounded w-full" placeholder="输入...">
+                        </div>
+                    </div>
+                    
+                    <div class="component bg-purple-50 p-3 rounded-lg border border-purple-200" data-type="checkbox" draggable="true">
+                        <div class="flex items-center">
+                            <i class="fas fa-check-square mr-2 text-purple-500"></i>
+                            <span class="font-medium">复选框</span>
+                        </div>
+                        <div class="component-preview mt-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="mr-2"> 选项
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="component bg-yellow-50 p-3 rounded-lg border border-yellow-200" data-type="radiobox" draggable="true">
+                        <div class="flex items-center">
+                            <i class="fas fa-dot-circle mr-2 text-yellow-500"></i>
+                            <span class="font-medium">单选框</span>
+                        </div>
+                        <div class="component-preview mt-2">
+                            <label class="flex items-center">
+                                <input type="radio" name="radio" class="mr-2" checked> 选项1
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="radio" class="mr-2"> 选项2
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="component bg-red-50 p-3 rounded-lg border border-red-200" data-type="slider" draggable="true">
+                        <div class="flex items-center">
+                            <i class="fas fa-sliders-h mr-2 text-red-500"></i>
+                            <span class="font-medium">滑块</span>
+                        </div>
+                        <div class="component-preview mt-2">
+                            <input type="range" class="w-full">
+                        </div>
+                    </div>
+                    
+                    <div class="component bg-indigo-50 p-3 rounded-lg border border-indigo-200" data-type="toggle" draggable="true">
+                        <div class="flex items-center">
+                            <i class="fas fa-toggle-on mr-2 text-indigo-500"></i>
+                            <span class="font-medium">开关</span>
+                        </div>
+                        <div class="component-preview mt-2">
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="component bg-pink-50 p-3 rounded-lg border border-pink-200" data-type="text" draggable="true">
+                        <div class="flex items-center">
+                            <i class="fas fa-paragraph mr-2 text-pink-500"></i>
+                            <span class="font-medium">文本</span>
+                        </div>
+                        <div class="component-preview mt-2">
+                            <p class="text-gray-800">这是一段文本</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 工作区 -->
+            <div class="bg-white p-4 rounded-lg shadow-md">
+                <div class="flex justify-between items-center mb-4 border-b pb-2">
+                    <h2 class="text-xl font-semibold text-gray-800">工作区</h2>
+                    <button id="clear-btn" class="text-red-500 hover:text-red-700 text-sm">
+                        <i class="fas fa-trash mr-1"></i>清空
+                    </button>
+                </div>
+                <div id="workspace" class="workspace rounded-lg p-4">
+                    <p class="text-gray-400 text-center py-16">拖拽组件到这里开始构建界面</p>
+                </div>
+            </div>
+            
+            <!-- 代码输出 -->
+            <div class="bg-white p-4 rounded-lg shadow-md">
+                <div class="flex justify-between items-center mb-4 border-b pb-2">
+                    <h2 class="text-xl font-semibold text-gray-800">生成的代码</h2>
+                    <button id="copy-btn" class="text-blue-500 hover:text-blue-700 text-sm">
+                        <i class="fas fa-copy mr-1"></i>复制
+                    </button>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">布局方向</label>
+                    <select id="layout-direction" class="w-full border rounded px-3 py-2">
+                        <option value="vertical">垂直</option>
+                        <option value="horizontal">水平</option>
+                    </select>
+                </div>
+                <div class="code-block p-4 overflow-auto max-h-96">
+                    <pre id="generated-code">// 生成的代码将显示在这里</pre>
+                </div>
+                <div class="mt-4">
+                    <button id="generate-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded">
+                        <i class="fas fa-code mr-2"></i>生成代码
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 初始化拖拽功能
+            const workspace = document.getElementById('workspace');
+            const components = document.getElementById('components');
+            
+            new Sortable(workspace, {
+                group: {
+                    name: 'shared',
+                    pull: 'clone',
+                    put: true
+                },
+                animation: 150,
+                ghostClass: 'bg-gray-100',
+                onAdd: function(evt) {
+                    const componentType = evt.item.getAttribute('data-type');
+                    const newComponent = createComponent(componentType);
+                    evt.item.outerHTML = newComponent;
+                }
+            });
+            
+            new Sortable(components, {
+                group: {
+                    name: 'shared',
+                    pull: 'clone',
+                    put: false
+                },
+                sort: false,
+                animation: 150
+            });
+            
+            // 高亮工作区当拖拽进入时
+            document.querySelectorAll('.component').forEach(comp => {
+                comp.addEventListener('dragstart', function() {
+                    workspace.classList.add('highlight');
+                });
+            });
+            
+            document.addEventListener('dragend', function() {
+                workspace.classList.remove('highlight');
+            });
+            
+            // 清空工作区
+            document.getElementById('clear-btn').addEventListener('click', function() {
+                workspace.innerHTML = '<p class="text-gray-400 text-center py-16">拖拽组件到这里开始构建界面</p>';
+                document.getElementById('generated-code').textContent = '// 生成的代码将显示在这里';
+            });
+            
+            // 生成代码
+            document.getElementById('generate-btn').addEventListener('click', generateCode);
+            
+            // 复制代码
+            document.getElementById('copy-btn').addEventListener('click', function() {
+                const code = document.getElementById('generated-code').textContent;
+                navigator.clipboard.writeText(code).then(() => {
+                    const btn = this;
+                    btn.innerHTML = '<i class="fas fa-check mr-1"></i>已复制';
+                    setTimeout(() => {
+                        btn.innerHTML = '<i class="fas fa-copy mr-1"></i>复制';
+                    }, 2000);
+                });
+            });
+            
+            // 创建组件函数
+            function createComponent(type) {
+                let html = '';
+                const id = 'comp-' + Math.random().toString(36).substr(2, 9);
+                
+                switch(type) {
+                    case 'button':
+                        html = `
+                            <div class="component bg-blue-50 p-3 rounded-lg border border-blue-200 mb-3" data-type="button" data-id="${id}">
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-square mr-2 text-blue-500"></i>
+                                        <span class="font-medium">按钮</span>
+                                    </div>
+                                    <button class="text-red-400 hover:text-red-600 delete-btn" data-id="${id}">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <div class="mt-2">
+                                    <input type="text" class="border px-2 py-1 rounded w-full mb-2 component-label" value="按钮" placeholder="按钮文本">
+                                    <div class="flex items-center">
+                                        <input type="color" class="mr-2 color-picker" value="#3b82f6">
+                                        <span>颜色</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                        
+                    case 'input':
+                        html = `
+                            <div class="component bg-green-50 p-3 rounded-lg border border-green-200 mb-3" data-type="input" data-id="${id}">
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-keyboard mr-2 text-green-500"></i>
+                                        <span class="font-medium">输入框</span>
+                                    </div>
+                                    <button class="text-red-400 hover:text-red-600 delete-btn" data-id="${id}">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <div class="mt-2">
+                                    <input type="text" class="border px-2 py-1 rounded w-full mb-2 component-label" value="输入框" placeholder="标签">
+                                    <input type="text" class="border px-2 py-1 rounded w-full" placeholder="占位文本">
+                                </div>
+                            </div>
+                        `;
+                        break;
+                        
+                    case 'checkbox':
+                        html = `
+                            <div class="component bg-purple-50 p-3 rounded-lg border border-purple-200 mb-3" data-type="checkbox" data-id="${id}">
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-check-square mr-2 text-purple-500"></i>
+                                        <span class="font-medium">复选框</span>
+                                    </div>
+                                    <button class="text-red-400 hover:text-red-600 delete-btn" data-id="${id}">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <div class="mt-2">
+                                    <input type="text" class="border px-2 py-1 rounded w-full mb-2 component-label" value="选项" placeholder="选项文本">
+                                    <div class="flex items-center">
+                                        <input type="checkbox" class="mr-2" checked>
+                                        <span>默认选中</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                        
+                    case 'radiobox':
+                        html = `
+                            <div class="component bg-yellow-50 p-3 rounded-lg border border-yellow-200 mb-3" data-type="radiobox" data-id="${id}">
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-dot-circle mr-2 text-yellow-500"></i>
+                                        <span class="font-medium">单选框</span>
+                                    </div>
+                                    <button class="text-red-400 hover:text-red-600 delete-btn" data-id="${id}">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <div class="mt-2">
+                                    <div class="mb-2">
+                                        <input type="text" class="border px-2 py-1 rounded w-full mb-1 option-input" value="选项1" placeholder="选项文本">
+                                        <div class="flex items-center">
+                                            <input type="radio" name="${id}" class="mr-2" checked>
+                                            <span>默认选中</span>
+                                        </div>
+                                    </div>
+                                    <div class="mb-2">
+                                        <input type="text" class="border px-2 py-1 rounded w-full mb-1 option-input" value="选项2" placeholder="选项文本">
+                                        <div class="flex items-center">
+                                            <input type="radio" name="${id}" class="mr-2">
+                                            <span>默认选中</span>
+                                        </div>
+                                    </div>
+                                    <button class="text-blue-500 hover:text-blue-700 text-sm add-option-btn">
+                                        <i class="fas fa-plus mr-1"></i>添加选项
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                        
+                    case 'slider':
+                        html = `
+                            <div class="component bg-red-50 p-3 rounded-lg border border-red-200 mb-3" data-type="slider" data-id="${id}">
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-sliders-h mr-2 text-red-500"></i>
+                                        <span class="font-medium">滑块</span>
+                                    </div>
+                                    <button class="text-red-400 hover:text-red-600 delete-btn" data-id="${id}">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <div class="mt-2">
+                                    <input type="text" class="border px-2 py-1 rounded w-full mb-2 component-label" value="滑块" placeholder="标签">
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label class="block text-sm text-gray-600 mb-1">最小值</label>
+                                            <input type="number" class="border px-2 py-1 rounded w-full" value="0">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm text-gray-600 mb-1">最大值</label>
+                                            <input type="number" class="border px-2 py-1 rounded w-full" value="100">
+                                        </div>
+                                    </div>
+                                    <div class="mt-2">
+                                        <label class="block text-sm text-gray-600 mb-1">初始值</label>
+                                        <input type="number" class="border px-2 py-1 rounded w-full" value="50">
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                        
+                    case 'toggle':
+                        html = `
+                            <div class="component bg-indigo-50 p-3 rounded-lg border border-indigo-200 mb-3" data-type="toggle" data-id="${id}">
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-toggle-on mr-2 text-indigo-500"></i>
+                                        <span class="font-medium">开关</span>
+                                    </div>
+                                    <button class="text-red-400 hover:text-red-600 delete-btn" data-id="${id}">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <div class="mt-2">
+                                    <input type="text" class="border px-2 py-1 rounded w-full mb-2 component-label" value="开关" placeholder="标签">
+                                    <div class="flex items-center">
+                                        <input type="checkbox" class="mr-2" checked>
+                                        <span>默认开启</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                        
+                    case 'text':
+                        html = `
+                            <div class="component bg-pink-50 p-3 rounded-lg border border-pink-200 mb-3" data-type="text" data-id="${id}">
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-paragraph mr-2 text-pink-500"></i>
+                                        <span class="font-medium">文本</span>
+                                    </div>
+                                    <button class="text-red-400 hover:text-red-600 delete-btn" data-id="${id}">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <div class="mt-2">
+                                    <textarea class="border px-2 py-1 rounded w-full" rows="3">这是一段文本</textarea>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                }
+                
+                return html;
+            }
+            
+            // 删除组件
+            workspace.addEventListener('click', function(e) {
+                if (e.target.classList.contains('delete-btn') || e.target.closest('.delete-btn')) {
+                    const btn = e.target.classList.contains('delete-btn') ? e.target : e.target.closest('.delete-btn');
+                    const id = btn.getAttribute('data-id');
+                    const component = document.querySelector(`[data-id="${id}"]`);
+                    component.remove();
+                    
+                    // 如果工作区空了，显示提示
+                    if (workspace.children.length === 0) {
+                        workspace.innerHTML = '<p class="text-gray-400 text-center py-16">拖拽组件到这里开始构建界面</p>';
+                    }
+                }
+                
+                // 添加单选框选项
+                if (e.target.classList.contains('add-option-btn') || e.target.closest('.add-option-btn')) {
+                    const btn = e.target.classList.contains('add-option-btn') ? e.target : e.target.closest('.add-option-btn');
+                    const component = btn.closest('.component');
+                    const id = component.getAttribute('data-id');
+                    
+                    const optionDiv = document.createElement('div');
+                    optionDiv.className = 'mb-2';
+                    optionDiv.innerHTML = `
+                        <input type="text" class="border px-2 py-1 rounded w-full mb-1 option-input" value="新选项" placeholder="选项文本">
+                        <div class="flex items-center">
+                            <input type="radio" name="${id}" class="mr-2">
+                            <span>默认选中</span>
+                        </div>
+                    `;
+                    
+                    btn.parentNode.insertBefore(optionDiv, btn);
+                }
+            });
+            
+            // 生成代码函数
+            function generateCode() {
+                const components = workspace.querySelectorAll('.component');
+                if (components.length === 0) {
+                    document.getElementById('generated-code').textContent = '// 请在工作区添加组件';
+                    return;
+                }
+                
+                const layoutDirection = document.getElementById('layout-direction').value;
+                let code = `#include <ftxui/dom/elements.hpp>\n#include <ftxui/screen/screen.hpp>\n#include <ftxui/component/component.hpp>\n#include <ftxui/component/screen_interactive.hpp>\n\nusing namespace ftxui;\n\nint main() {\n`;
+                
+                // 生成组件变量
+                components.forEach((comp, index) => {
+                    const type = comp.getAttribute('data-type');
+                    const id = `comp${index + 1}`;
+                    
+                    switch(type) {
+                        case 'button':
+                            const buttonText = comp.querySelector('.component-label').value || '按钮';
+                            code += `  auto ${id} = Button("${buttonText}", [] { /* 按钮点击操作 */ });\n`;
+                            break;
+                            
+                        case 'input':
+                            const inputLabel = comp.querySelector('.component-label').value || '输入';
+                            const placeholder = comp.querySelector('input[type="text"]:not(.component-label)').placeholder || '';
+                            code += `  std::string ${id}_value;\n`;
+                            code += `  auto ${id} = Input(&${id}_value, "${placeholder}");\n`;
+                            break;
+                            
+                        case 'checkbox':
+                            const checkboxLabel = comp.querySelector('.component-label').value || '选项';
+                            const isChecked = comp.querySelector('input[type="checkbox"]').checked;
+                            code += `  bool ${id}_checked = ${isChecked ? "true" : "false"};\n`;
+                            code += `  auto ${id} = Checkbox("${checkboxLabel}", &${id}_checked);\n`;
+                            break;
+                            
+                        case 'radiobox':
+                            const options = Array.from(comp.querySelectorAll('.option-input')).map(input => input.value || '选项');
+                            const selectedIndex = Array.from(comp.querySelectorAll(`input[type="radio"][name="${comp.getAttribute('data-id')}"]`)).findIndex(radio => radio.checked);
+                            code += `  int ${id}_selected = ${selectedIndex >= 0 ? selectedIndex : 0};\n`;
+                            code += `  std::vector<std::string> ${id}_options = {\n`;
+                            options.forEach(opt => code += `    "${opt}",\n`);
+                            code += `  };\n`;
+                            code += `  auto ${id} = Radiobox(&${id}_options, &${id}_selected);\n`;
+                            break;
+                            
+                        case 'slider':
+                            const sliderLabel = comp.querySelector('.component-label').value || '滑块';
+                            const min = comp.querySelector('input[type="number"]:nth-of-type(1)').value || '0';
+                            const max = comp.querySelector('input[type="number"]:nth-of-type(2)').value || '100';
+                            const value = comp.querySelector('input[type="number"]:nth-of-type(3)').value || '50';
+                            code += `  int ${id}_value = ${value};\n`;
+                            code += `  auto ${id} = Slider("${sliderLabel}", &${id}_value, ${min}, ${max});\n`;
+                            break;
+                            
+                        case 'toggle':
+                            const toggleLabel = comp.querySelector('.component-label').value || '开关';
+                            const isToggled = comp.querySelector('input[type="checkbox"]').checked;
+                            code += `  bool ${id}_value = ${isToggled ? "true" : "false"};\n`;
+                            code += `  auto ${id} = Toggle("${toggleLabel}", &${id}_value);\n`;
+                            break;
+                            
+                        case 'text':
+                            const textContent = comp.querySelector('textarea').value || '文本内容';
+                            code += `  auto ${id} = text("${textContent}");\n`;
+                            break;
+                    }
+                });
+                
+                // 生成布局
+                code += `\n  // 创建布局\n`;
+                if (layoutDirection === 'vertical') {
+                    code += `  auto layout = Container::Vertical({\n`;
+                } else {
+                    code += `  auto layout = Container::Horizontal({\n`;
+                }
+                
+                components.forEach((comp, index) => {
+                    const id = `comp${index + 1}`;
+                    code += `    ${id},\n`;
+                });
+                
+                code += `  });\n\n`;
+                
+                // 生成渲染器
+                code += `  // 创建渲染器\n`;
+                code += `  auto renderer = Renderer(layout, [&] {\n`;
+                code += `    return vbox({\n`;
+                
+                components.forEach((comp, index) => {
+                    const id = `comp${index + 1}`;
+                    const type = comp.getAttribute('data-type');
+                    
+                    if (type === 'text') {
+                        code += `      ${id} | center,\n`;
+                    } else {
+                        code += `      ${id}->Render(),\n`;
+                    }
+                });
+                
+                code += `    }) | border | center;\n`;
+                code += `  });\n\n`;
+                
+                // 主循环
+                code += `  // 运行界面\n`;
+                code += `  auto screen = ScreenInteractive::FitComponent();\n`;
+                code += `  screen.Loop(renderer);\n`;
+                code += `  return 0;\n`;
+                code += `}\n`;
+                
+                document.getElementById('generated-code').textContent = code;
+            }
+        });
+    </script>
+</body>
+</html>
