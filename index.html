@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +7,21 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#4f46e5',
+                        success: '#16a34a',
+                        warning: '#ea580c',
+                        danger: '#dc2626',
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         .component {
             cursor: move;
@@ -39,18 +54,95 @@
             margin: 0.25rem 0;
             background-color: white;
         }
+        .container-element {
+            min-height: 50px;
+            background-color: #eff6ff;
+            border: 2px dashed #93c5fd;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .container-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 10px;
+            background-color: #dbeafe;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        .container-body {
+            min-height: 40px;
+        }
+        .component-config {
+            background-color: #f1f5f9;
+            padding: 8px;
+            border-radius: 6px;
+            margin-top: 8px;
+        }
+        .config-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .align-option {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .align-option:hover {
+            background-color: #e2e8f0;
+        }
+        .align-option.active {
+            background-color: #dbeafe;
+            color: #2563eb;
+        }
+        .tab-button {
+            padding: 6px 12px;
+            border-radius: 4px 4px 0 0;
+            background-color: #e2e8f0;
+            cursor: pointer;
+        }
+        .tab-button.active {
+            background-color: #dbeafe;
+            color: #2563eb;
+            font-weight: 500;
+        }
+        .tab-content {
+            display: none;
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+        }
+        .tab-content.active {
+            display: block;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
     <div class="container mx-auto px-4 py-8">
-        <h1 class="text-3xl font-bold text-center text-blue-700 mb-2">FTXUI 代码生成器</h1>
-        <p class="text-center text-gray-600 mb-8">通过拖拽组件生成C++ FTXUI界面代码</p>
+        <h1 class="text-3xl font-bold text-center text-blue-700 mb-2">FTXUI 代码生成器 - 增强版</h1>
+        <p class="text-center text-gray-600 mb-8">通过拖拽组件生成C++ FTXUI界面代码，支持嵌套布局和样式自定义</p>
         
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <!-- 组件面板 -->
             <div class="bg-white p-4 rounded-lg shadow-md">
                 <h2 class="text-xl font-semibold mb-4 text-gray-800 border-b pb-2">组件库</h2>
-                <div id="components" class="space-y-3">
+                
+                <!-- 标签页导航 -->
+                <div class="flex mb-4">
+                    <div class="tab-button active" data-tab="basic">基础组件</div>
+                    <div class="tab-button" data-tab="containers">布局容器</div>
+                    <div class="tab-button" data-tab="advanced">高级组件</div>
+                </div>
+                
+                <!-- 基础组件 -->
+                <div id="basic-components" class="space-y-3 tab-content active">
                     <div class="component bg-blue-50 p-3 rounded-lg border border-blue-200" data-type="button" draggable="true">
                         <div class="flex items-center">
                             <i class="fas fa-square mr-2 text-blue-500"></i>
@@ -131,18 +223,157 @@
                         </div>
                     </div>
                 </div>
+                
+                <!-- 布局容器 -->
+                <div id="container-components" class="space-y-3 tab-content">
+                    <div class="component bg-blue-100 p-3 rounded-lg border border-blue-300" data-type="vcontainer" draggable="true">
+                        <div class="flex items-center">
+                            <i class="fas fa-arrows-alt-v mr-2 text-blue-600"></i>
+                            <span class="font-medium">垂直容器</span>
+                        </div>
+                        <div class="component-preview mt-2">
+                            <div class="border border-dashed border-blue-300 p-2 rounded">
+                                <div class="text-center text-blue-500">垂直容器</div>
+                                <div class="h-4"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="component bg-green-100 p-3 rounded-lg border border-green-300" data-type="hcontainer" draggable="true">
+                        <div class="flex items-center">
+                            <i class="fas fa-arrows-alt-h mr-2 text-green-600"></i>
+                            <span class="font-medium">水平容器</span>
+                        </div>
+                        <div class="component-preview mt-2">
+                            <div class="border border-dashed border-green-300 p-2 rounded flex justify-between">
+                                <div class="text-green-500">水平</div>
+                                <div class="text-green-500">容器</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="component bg-purple-100 p-3 rounded-lg border border-purple-300" data-type="tabcontainer" draggable="true">
+                        <div class="flex items-center">
+                            <i class="fas fa-folder mr-2 text-purple-600"></i>
+                            <span class="font-medium">选项卡容器</span>
+                        </div>
+                        <div class="component-preview mt-2">
+                            <div class="border border-dashed border-purple-300 p-2 rounded">
+                                <div class="flex">
+                                    <div class="px-3 py-1 bg-gray-200 rounded-t mr-1">标签1</div>
+                                    <div class="px-3 py-1 rounded-t">标签2</div>
+                                </div>
+                                <div class="h-4"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="component bg-yellow-100 p-3 rounded-lg border border-yellow-300" data-type="grid" draggable="true">
+                        <div class="flex items-center">
+                            <i class="fas fa-th mr-2 text-yellow-600"></i>
+                            <span class="font-medium">网格布局</span>
+                        </div>
+                        <div class="component-preview mt-2">
+                            <div class="border border-dashed border-yellow-300 p-2 rounded">
+                                <div class="grid grid-cols-2 gap-1">
+                                    <div class="h-4 bg-gray-200"></div>
+                                    <div class="h-4 bg-gray-200"></div>
+                                    <div class="h-4 bg-gray-200"></div>
+                                    <div class="h-4 bg-gray-200"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 高级组件 -->
+                <div id="advanced-components" class="space-y-3 tab-content">
+                    <div class="component bg-red-100 p-3 rounded-lg border border-red-300" data-type="dropdown" draggable="true">
+                        <div class="flex items-center">
+                            <i class="fas fa-caret-down mr-2 text-red-600"></i>
+                            <span class="font-medium">下拉菜单</span>
+                        </div>
+                        <div class="component-preview mt-2">
+                            <select class="border px-2 py-1 rounded w-full">
+                                <option>选项1</option>
+                                <option>选项2</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="component bg-indigo-100 p-3 rounded-lg border border-indigo-300" data-type="canvas" draggable="true">
+                        <div class="flex items-center">
+                            <i class="fas fa-paint-brush mr-2 text-indigo-600"></i>
+                            <span class="font-medium">画布</span>
+                        </div>
+                        <div class="component-preview mt-2">
+                            <div class="border border-dashed border-indigo-300 p-2 rounded h-16 flex items-center justify-center">
+                                <span class="text-indigo-500">绘图区域</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="component bg-pink-100 p-3 rounded-lg border border-pink-300" data-type="list" draggable="true">
+                        <div class="flex items-center">
+                            <i class="fas fa-list mr-2 text-pink-600"></i>
+                            <span class="font-medium">列表</span>
+                        </div>
+                        <div class="component-preview mt-2">
+                            <div class="border border-dashed border-pink-300 p-2 rounded">
+                                <div class="border-b pb-1 mb-1">列表项1</div>
+                                <div class="border-b pb-1 mb-1">列表项2</div>
+                                <div>列表项3</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="component bg-teal-100 p-3 rounded-lg border border-teal-300" data-type="progress" draggable="true">
+                        <div class="flex items-center">
+                            <i class="fas fa-spinner mr-2 text-teal-600"></i>
+                            <span class="font-medium">进度条</span>
+                        </div>
+                        <div class="component-preview mt-2">
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="bg-blue-600 h-2.5 rounded-full" style="width: 45%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="component bg-orange-100 p-3 rounded-lg border border-orange-300" data-type="separator" draggable="true">
+                        <div class="flex items-center">
+                            <i class="fas fa-grip-lines mr-2 text-orange-600"></i>
+                            <span class="font-medium">分隔线</span>
+                        </div>
+                        <div class="component-preview mt-2">
+                            <hr class="border-t border-gray-300">
+                        </div>
+                    </div>
+                </div>
             </div>
             
             <!-- 工作区 -->
             <div class="bg-white p-4 rounded-lg shadow-md">
                 <div class="flex justify-between items-center mb-4 border-b pb-2">
                     <h2 class="text-xl font-semibold text-gray-800">工作区</h2>
-                    <button id="clear-btn" class="text-red-500 hover:text-red-700 text-sm">
-                        <i class="fas fa-trash mr-1"></i>清空
-                    </button>
+                    <div>
+                        <button id="clear-btn" class="text-red-500 hover:text-red-700 text-sm mr-3">
+                            <i class="fas fa-trash mr-1"></i>清空
+                        </button>
+                        <button id="export-btn" class="text-green-500 hover:text-green-700 text-sm">
+                            <i class="fas fa-download mr-1"></i>导出
+                        </button>
+                    </div>
                 </div>
                 <div id="workspace" class="workspace rounded-lg p-4">
                     <p class="text-gray-400 text-center py-16">拖拽组件到这里开始构建界面</p>
+                </div>
+                <div class="mt-4 flex gap-2">
+                    <button id="vcontainer-btn" class="flex-1 bg-blue-100 hover:bg-blue-200 text-blue-700 py-1 px-3 rounded">
+                        <i class="fas fa-arrows-alt-v mr-1"></i>添加垂直容器
+                    </button>
+                    <button id="hcontainer-btn" class="flex-1 bg-green-100 hover:bg-green-200 text-green-700 py-1 px-3 rounded">
+                        <i class="fas fa-arrows-alt-h mr-1"></i>添加水平容器
+                    </button>
                 </div>
             </div>
             
@@ -150,22 +381,22 @@
             <div class="bg-white p-4 rounded-lg shadow-md">
                 <div class="flex justify-between items-center mb-4 border-b pb-2">
                     <h2 class="text-xl font-semibold text-gray-800">生成的代码</h2>
-                    <button id="copy-btn" class="text-blue-500 hover:text-blue-700 text-sm">
-                        <i class="fas fa-copy mr-1"></i>复制
-                    </button>
+                    <div>
+                        <button id="copy-btn" class="text-blue-500 hover:text-blue-700 text-sm mr-2">
+                            <i class="fas fa-copy mr-1"></i>复制
+                        </button>
+                        <button id="download-btn" class="text-purple-500 hover:text-purple-700 text-sm">
+                            <i class="fas fa-file-download mr-1"></i>下载
+                        </button>
+                    </div>
                 </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">布局方向</label>
-                    <select id="layout-direction" class="w-full border rounded px-3 py-2">
-                        <option value="vertical">垂直</option>
-                        <option value="horizontal">水平</option>
-                    </select>
-                </div>
-                <div class="code-block p-4 overflow-auto max-h-96">
+                
+                <div class="code-block p-4 overflow-auto max-h-[500px]">
                     <pre id="generated-code">// 生成的代码将显示在这里</pre>
                 </div>
+                
                 <div class="mt-4">
-                    <button id="generate-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded">
+                    <button id="generate-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded flex items-center justify-center">
                         <i class="fas fa-code mr-2"></i>生成代码
                     </button>
                 </div>
@@ -177,13 +408,28 @@
         document.addEventListener('DOMContentLoaded', function() {
             // 初始化拖拽功能
             const workspace = document.getElementById('workspace');
-            const components = document.getElementById('components');
+            const components = document.querySelectorAll('.tab-content');
             
+            // 标签页切换
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    // 移除所有active类
+                    document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+                    
+                    // 添加active类到当前按钮和对应内容
+                    this.classList.add('active');
+                    const tabId = this.getAttribute('data-tab');
+                    document.getElementById(`${tabId}-components`).classList.add('active');
+                });
+            });
+            
+            // 初始化工作区
             new Sortable(workspace, {
                 group: {
                     name: 'shared',
-                    pull: 'clone',
-                    put: true
+                    pull: false,
+                    put: ['shared']
                 },
                 animation: 150,
                 ghostClass: 'bg-gray-100',
@@ -194,14 +440,17 @@
                 }
             });
             
-            new Sortable(components, {
-                group: {
-                    name: 'shared',
-                    pull: 'clone',
-                    put: false
-                },
-                sort: false,
-                animation: 150
+            // 初始化组件库
+            components.forEach(container => {
+                new Sortable(container, {
+                    group: {
+                        name: 'shared',
+                        pull: 'clone',
+                        put: false
+                    },
+                    sort: false,
+                    animation: 150
+                });
             });
             
             // 高亮工作区当拖拽进入时
@@ -221,6 +470,27 @@
                 document.getElementById('generated-code').textContent = '// 生成的代码将显示在这里';
             });
             
+            // 添加容器按钮
+            document.getElementById('vcontainer-btn').addEventListener('click', function() {
+                const container = createComponent('vcontainer');
+                if (workspace.children.length === 1 && workspace.children[0].classList.contains('text-gray-400')) {
+                    workspace.innerHTML = container;
+                } else {
+                    workspace.insertAdjacentHTML('beforeend', container);
+                }
+                initializeContainer(workspace.lastElementChild);
+            });
+            
+            document.getElementById('hcontainer-btn').addEventListener('click', function() {
+                const container = createComponent('hcontainer');
+                if (workspace.children.length === 1 && workspace.children[0].classList.contains('text-gray-400')) {
+                    workspace.innerHTML = container;
+                } else {
+                    workspace.insertAdjacentHTML('beforeend', container);
+                }
+                initializeContainer(workspace.lastElementChild);
+            });
+            
             // 生成代码
             document.getElementById('generate-btn').addEventListener('click', generateCode);
             
@@ -234,6 +504,22 @@
                         btn.innerHTML = '<i class="fas fa-copy mr-1"></i>复制';
                     }, 2000);
                 });
+            });
+            
+            // 下载代码
+            document.getElementById('download-btn').addEventListener('click', function() {
+                const code = document.getElementById('generated-code').textContent;
+                const blob = new Blob([code], {type: 'text/plain'});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'ftxui_generated_code.cpp';
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                }, 0);
             });
             
             // 创建组件函数
@@ -260,6 +546,20 @@
                                         <input type="color" class="mr-2 color-picker" value="#3b82f6">
                                         <span>颜色</span>
                                     </div>
+                                    <div class="mt-2">
+                                        <label class="block text-sm text-gray-600 mb-1">对齐方式</label>
+                                        <div class="flex gap-2">
+                                            <div class="align-option active" data-align="left">
+                                                <i class="fas fa-align-left"></i>
+                                            </div>
+                                            <div class="align-option" data-align="center">
+                                                <i class="fas fa-align-center"></i>
+                                            </div>
+                                            <div class="align-option" data-align="right">
+                                                <i class="fas fa-align-right"></i>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         `;
@@ -280,6 +580,20 @@
                                 <div class="mt-2">
                                     <input type="text" class="border px-2 py-1 rounded w-full mb-2 component-label" value="输入框" placeholder="标签">
                                     <input type="text" class="border px-2 py-1 rounded w-full" placeholder="占位文本">
+                                    <div class="mt-2">
+                                        <label class="block text-sm text-gray-600 mb-1">对齐方式</label>
+                                        <div class="flex gap-2">
+                                            <div class="align-option" data-align="left">
+                                                <i class="fas fa-align-left"></i>
+                                            </div>
+                                            <div class="align-option active" data-align="center">
+                                                <i class="fas fa-align-center"></i>
+                                            </div>
+                                            <div class="align-option" data-align="right">
+                                                <i class="fas fa-align-right"></i>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         `;
@@ -302,6 +616,20 @@
                                     <div class="flex items-center">
                                         <input type="checkbox" class="mr-2" checked>
                                         <span>默认选中</span>
+                                    </div>
+                                    <div class="mt-2">
+                                        <label class="block text-sm text-gray-600 mb-1">对齐方式</label>
+                                        <div class="flex gap-2">
+                                            <div class="align-option active" data-align="left">
+                                                <i class="fas fa-align-left"></i>
+                                            </div>
+                                            <div class="align-option" data-align="center">
+                                                <i class="fas fa-align-center"></i>
+                                            </div>
+                                            <div class="align-option" data-align="right">
+                                                <i class="fas fa-align-right"></i>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -338,6 +666,20 @@
                                     <button class="text-blue-500 hover:text-blue-700 text-sm add-option-btn">
                                         <i class="fas fa-plus mr-1"></i>添加选项
                                     </button>
+                                    <div class="mt-2">
+                                        <label class="block text-sm text-gray-600 mb-1">对齐方式</label>
+                                        <div class="flex gap-2">
+                                            <div class="align-option active" data-align="left">
+                                                <i class="fas fa-align-left"></i>
+                                            </div>
+                                            <div class="align-option" data-align="center">
+                                                <i class="fas fa-align-center"></i>
+                                            </div>
+                                            <div class="align-option" data-align="right">
+                                                <i class="fas fa-align-right"></i>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         `;
@@ -371,6 +713,20 @@
                                         <label class="block text-sm text-gray-600 mb-1">初始值</label>
                                         <input type="number" class="border px-2 py-1 rounded w-full" value="50">
                                     </div>
+                                    <div class="mt-2">
+                                        <label class="block text-sm text-gray-600 mb-1">对齐方式</label>
+                                        <div class="flex gap-2">
+                                            <div class="align-option" data-align="left">
+                                                <i class="fas fa-align-left"></i>
+                                            </div>
+                                            <div class="align-option active" data-align="center">
+                                                <i class="fas fa-align-center"></i>
+                                            </div>
+                                            <div class="align-option" data-align="right">
+                                                <i class="fas fa-align-right"></i>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         `;
@@ -394,6 +750,20 @@
                                         <input type="checkbox" class="mr-2" checked>
                                         <span>默认开启</span>
                                     </div>
+                                    <div class="mt-2">
+                                        <label class="block text-sm text-gray-600 mb-1">对齐方式</label>
+                                        <div class="flex gap-2">
+                                            <div class="align-option" data-align="left">
+                                                <i class="fas fa-align-left"></i>
+                                            </div>
+                                            <div class="align-option active" data-align="center">
+                                                <i class="fas fa-align-center"></i>
+                                            </div>
+                                            <div class="align-option" data-align="right">
+                                                <i class="fas fa-align-right"></i>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         `;
@@ -413,6 +783,247 @@
                                 </div>
                                 <div class="mt-2">
                                     <textarea class="border px-2 py-1 rounded w-full" rows="3">这是一段文本</textarea>
+                                    <div class="mt-2">
+                                        <label class="block text-sm text-gray-600 mb-1">对齐方式</label>
+                                        <div class="flex gap-2">
+                                            <div class="align-option" data-align="left">
+                                                <i class="fas fa-align-left"></i>
+                                            </div>
+                                            <div class="align-option active" data-align="center">
+                                                <i class="fas fa-align-center"></i>
+                                            </div>
+                                            <div class="align-option" data-align="right">
+                                                <i class="fas fa-align-right"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                        
+                    case 'vcontainer':
+                        html = `
+                            <div class="container-element" data-type="vcontainer" data-id="${id}">
+                                <div class="container-header">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-arrows-alt-v mr-2 text-blue-600"></i>
+                                        <span>垂直容器</span>
+                                    </div>
+                                    <button class="text-red-400 hover:text-red-600 delete-btn" data-id="${id}">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <div class="container-body" id="container-${id}">
+                                    <p class="text-gray-400 text-center py-8">拖拽组件到容器内</p>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                        
+                    case 'hcontainer':
+                        html = `
+                            <div class="container-element" data-type="hcontainer" data-id="${id}">
+                                <div class="container-header">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-arrows-alt-h mr-2 text-green-600"></i>
+                                        <span>水平容器</span>
+                                    </div>
+                                    <button class="text-red-400 hover:text-red-600 delete-btn" data-id="${id}">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <div class="container-body" id="container-${id}">
+                                    <p class="text-gray-400 text-center py-8">拖拽组件到容器内</p>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                        
+                    case 'tabcontainer':
+                        html = `
+                            <div class="container-element" data-type="tabcontainer" data-id="${id}">
+                                <div class="container-header">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-folder mr-2 text-purple-600"></i>
+                                        <span>选项卡容器</span>
+                                    </div>
+                                    <button class="text-red-400 hover:text-red-600 delete-btn" data-id="${id}">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <div class="container-body p-2">
+                                    <div class="flex mb-2">
+                                        <div class="tab-button active">标签1</div>
+                                        <div class="tab-button">标签2</div>
+                                        <button class="text-blue-500 hover:text-blue-700 text-sm ml-auto">
+                                            <i class="fas fa-plus mr-1"></i>添加标签
+                                        </button>
+                                    </div>
+                                    <div class="border border-gray-200 rounded p-2 min-h-[100px]">
+                                        <div class="tab-content active">
+                                            <p class="text-gray-400 text-center py-6">拖拽组件到选项卡1</p>
+                                        </div>
+                                        <div class="tab-content">
+                                            <p class="text-gray-400 text-center py-6">拖拽组件到选项卡2</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                        
+                    case 'dropdown':
+                        html = `
+                            <div class="component bg-red-100 p-3 rounded-lg border border-red-300 mb-3" data-type="dropdown" data-id="${id}">
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-caret-down mr-2 text-red-600"></i>
+                                        <span class="font-medium">下拉菜单</span>
+                                    </div>
+                                    <button class="text-red-400 hover:text-red-600 delete-btn" data-id="${id}">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <div class="mt-2">
+                                    <input type="text" class="border px-2 py-1 rounded w-full mb-2 component-label" value="下拉菜单" placeholder="标签">
+                                    <div class="mb-2">
+                                        <input type="text" class="border px-2 py-1 rounded w-full mb-1 option-input" value="选项1" placeholder="选项文本">
+                                    </div>
+                                    <div class="mb-2">
+                                        <input type="text" class="border px-2 py-1 rounded w-full mb-1 option-input" value="选项2" placeholder="选项文本">
+                                    </div>
+                                    <button class="text-blue-500 hover:text-blue-700 text-sm add-option-btn">
+                                        <i class="fas fa-plus mr-1"></i>添加选项
+                                    </button>
+                                    <div class="mt-2">
+                                        <label class="block text-sm text-gray-600 mb-1">对齐方式</label>
+                                        <div class="flex gap-2">
+                                            <div class="align-option" data-align="left">
+                                                <i class="fas fa-align-left"></i>
+                                            </div>
+                                            <div class="align-option active" data-align="center">
+                                                <i class="fas fa-align-center"></i>
+                                            </div>
+                                            <div class="align-option" data-align="right">
+                                                <i class="fas fa-align-right"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                        
+                    case 'list':
+                        html = `
+                            <div class="component bg-pink-100 p-3 rounded-lg border border-pink-300 mb-3" data-type="list" data-id="${id}">
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-list mr-2 text-pink-600"></i>
+                                        <span class="font-medium">列表</span>
+                                    </div>
+                                    <button class="text-red-400 hover:text-red-600 delete-btn" data-id="${id}">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <div class="mt-2">
+                                    <div class="mb-2">
+                                        <input type="text" class="border px-2 py-1 rounded w-full mb-1 option-input" value="列表项1" placeholder="列表项文本">
+                                    </div>
+                                    <div class="mb-2">
+                                        <input type="text" class="border px-2 py-1 rounded w-full mb-1 option-input" value="列表项2" placeholder="列表项文本">
+                                    </div>
+                                    <button class="text-blue-500 hover:text-blue-700 text-sm add-option-btn">
+                                        <i class="fas fa-plus mr-1"></i>添加列表项
+                                    </button>
+                                    <div class="mt-2">
+                                        <label class="block text-sm text-gray-600 mb-1">对齐方式</label>
+                                        <div class="flex gap-2">
+                                            <div class="align-option active" data-align="left">
+                                                <i class="fas fa-align-left"></i>
+                                            </div>
+                                            <div class="align-option" data-align="center">
+                                                <i class="fas fa-align-center"></i>
+                                            </div>
+                                            <div class="align-option" data-align="right">
+                                                <i class="fas fa-align-right"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                        
+                    case 'progress':
+                        html = `
+                            <div class="component bg-teal-100 p-3 rounded-lg border border-teal-300 mb-3" data-type="progress" data-id="${id}">
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-spinner mr-2 text-teal-600"></i>
+                                        <span class="font-medium">进度条</span>
+                                    </div>
+                                    <button class="text-red-400 hover:text-red-600 delete-btn" data-id="${id}">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <div class="mt-2">
+                                    <input type="text" class="border px-2 py-1 rounded w-full mb-2 component-label" value="进度" placeholder="标签">
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label class="block text-sm text-gray-600 mb-1">初始值</label>
+                                            <input type="number" class="border px-2 py-1 rounded w-full" value="45" min="0" max="100">
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm text-gray-600 mb-1">最大值</label>
+                                            <input type="number" class="border px-2 py-1 rounded w-full" value="100">
+                                        </div>
+                                    </div>
+                                    <div class="mt-2">
+                                        <label class="block text-sm text-gray-600 mb-1">对齐方式</label>
+                                        <div class="flex gap-2">
+                                            <div class="align-option" data-align="left">
+                                                <i class="fas fa-align-left"></i>
+                                            </div>
+                                            <div class="align-option active" data-align="center">
+                                                <i class="fas fa-align-center"></i>
+                                            </div>
+                                            <div class="align-option" data-align="right">
+                                                <i class="fas fa-align-right"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                        
+                    case 'separator':
+                        html = `
+                            <div class="component bg-orange-100 p-3 rounded-lg border border-orange-300 mb-3" data-type="separator" data-id="${id}">
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-grip-lines mr-2 text-orange-600"></i>
+                                        <span class="font-medium">分隔线</span>
+                                    </div>
+                                    <button class="text-red-400 hover:text-red-600 delete-btn" data-id="${id}">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                                <div class="mt-2">
+                                    <div class="flex items-center">
+                                        <input type="color" class="mr-2 color-picker" value="#6b7280">
+                                        <span>颜色</span>
+                                    </div>
+                                    <div class="mt-2">
+                                        <label class="block text-sm text-gray-600 mb-1">样式</label>
+                                        <select class="border px-2 py-1 rounded w-full">
+                                            <option>实线</option>
+                                            <option>虚线</option>
+                                            <option>双线</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
                         `;
@@ -420,6 +1031,27 @@
                 }
                 
                 return html;
+            }
+            
+            // 初始化容器
+            function initializeContainer(container) {
+                const containerId = container.getAttribute('data-id');
+                const containerBody = container.querySelector('.container-body');
+                
+                new Sortable(containerBody, {
+                    group: {
+                        name: 'shared',
+                        pull: false,
+                        put: ['shared']
+                    },
+                    animation: 150,
+                    ghostClass: 'bg-gray-100',
+                    onAdd: function(evt) {
+                        const componentType = evt.item.getAttribute('data-type');
+                        const newComponent = createComponent(componentType);
+                        evt.item.outerHTML = newComponent;
+                    }
+                });
             }
             
             // 删除组件
@@ -454,18 +1086,27 @@
                     
                     btn.parentNode.insertBefore(optionDiv, btn);
                 }
+                
+                // 对齐选项
+                if (e.target.classList.contains('align-option') || e.target.closest('.align-option')) {
+                    const option = e.target.classList.contains('align-option') ? e.target : e.target.closest('.align-option');
+                    const parent = option.parentNode;
+                    const options = parent.querySelectorAll('.align-option');
+                    
+                    options.forEach(opt => opt.classList.remove('active'));
+                    option.classList.add('active');
+                }
             });
             
             // 生成代码函数
             function generateCode() {
-                const components = workspace.querySelectorAll('.component');
+                const components = workspace.querySelectorAll('.component, .container-element');
                 if (components.length === 0) {
                     document.getElementById('generated-code').textContent = '// 请在工作区添加组件';
                     return;
                 }
                 
-                const layoutDirection = document.getElementById('layout-direction').value;
-                let code = `#include <ftxui/dom/elements.hpp>\n#include <ftxui/screen/screen.hpp>\n#include <ftxui/component/component.hpp>\n#include <ftxui/component/screen_interactive.hpp>\n\nusing namespace ftxui;\n\nint main() {\n`;
+                let code = `#include <ftxui/dom/elements.hpp>\n#include <ftxui/screen/screen.hpp>\n#include <ftxui/component/component.hpp>\n#include <ftxui/component/screen_interactive.hpp>\n#include <vector>\n\nusing namespace ftxui;\n\nint main() {\n`;
                 
                 // 生成组件变量
                 components.forEach((comp, index) => {
@@ -474,68 +1115,164 @@
                     
                     switch(type) {
                         case 'button':
-                            const buttonText = comp.querySelector('.component-label').value || '按钮';
+                            const buttonText = comp.querySelector('.component-label')?.value || '按钮';
+                            const buttonAlign = comp.querySelector('.align-option.active')?.getAttribute('data-align') || 'center';
                             code += `  auto ${id} = Button("${buttonText}", [] { /* 按钮点击操作 */ });\n`;
+                            if (buttonAlign === 'left') code += `  ${id} = ${id} | align_left;\n`;
+                            if (buttonAlign === 'right') code += `  ${id} = ${id} | align_right;\n`;
                             break;
                             
                         case 'input':
-                            const inputLabel = comp.querySelector('.component-label').value || '输入';
-                            const placeholder = comp.querySelector('input[type="text"]:not(.component-label)').placeholder || '';
+                            const inputLabel = comp.querySelector('.component-label')?.value || '输入';
+                            const placeholder = comp.querySelector('input[type="text"]:not(.component-label)')?.placeholder || '';
+                            const inputAlign = comp.querySelector('.align-option.active')?.getAttribute('data-align') || 'center';
                             code += `  std::string ${id}_value;\n`;
                             code += `  auto ${id} = Input(&${id}_value, "${placeholder}");\n`;
+                            if (inputAlign === 'left') code += `  ${id} = ${id} | align_left;\n`;
+                            if (inputAlign === 'right') code += `  ${id} = ${id} | align_right;\n`;
                             break;
                             
                         case 'checkbox':
-                            const checkboxLabel = comp.querySelector('.component-label').value || '选项';
-                            const isChecked = comp.querySelector('input[type="checkbox"]').checked;
+                            const checkboxLabel = comp.querySelector('.component-label')?.value || '选项';
+                            const isChecked = comp.querySelector('input[type="checkbox"]')?.checked || false;
+                            const checkboxAlign = comp.querySelector('.align-option.active')?.getAttribute('data-align') || 'center';
                             code += `  bool ${id}_checked = ${isChecked ? "true" : "false"};\n`;
                             code += `  auto ${id} = Checkbox("${checkboxLabel}", &${id}_checked);\n`;
+                            if (checkboxAlign === 'left') code += `  ${id} = ${id} | align_left;\n`;
+                            if (checkboxAlign === 'right') code += `  ${id} = ${id} | align_right;\n`;
                             break;
                             
                         case 'radiobox':
                             const options = Array.from(comp.querySelectorAll('.option-input')).map(input => input.value || '选项');
                             const selectedIndex = Array.from(comp.querySelectorAll(`input[type="radio"][name="${comp.getAttribute('data-id')}"]`)).findIndex(radio => radio.checked);
+                            const radioboxAlign = comp.querySelector('.align-option.active')?.getAttribute('data-align') || 'center';
                             code += `  int ${id}_selected = ${selectedIndex >= 0 ? selectedIndex : 0};\n`;
                             code += `  std::vector<std::string> ${id}_options = {\n`;
                             options.forEach(opt => code += `    "${opt}",\n`);
                             code += `  };\n`;
                             code += `  auto ${id} = Radiobox(&${id}_options, &${id}_selected);\n`;
+                            if (radioboxAlign === 'left') code += `  ${id} = ${id} | align_left;\n`;
+                            if (radioboxAlign === 'right') code += `  ${id} = ${id} | align_right;\n`;
                             break;
                             
                         case 'slider':
-                            const sliderLabel = comp.querySelector('.component-label').value || '滑块';
-                            const min = comp.querySelector('input[type="number"]:nth-of-type(1)').value || '0';
-                            const max = comp.querySelector('input[type="number"]:nth-of-type(2)').value || '100';
-                            const value = comp.querySelector('input[type="number"]:nth-of-type(3)').value || '50';
+                            const sliderLabel = comp.querySelector('.component-label')?.value || '滑块';
+                            const min = comp.querySelector('input[type="number"]:nth-of-type(1)')?.value || '0';
+                            const max = comp.querySelector('input[type="number"]:nth-of-type(2)')?.value || '100';
+                            const value = comp.querySelector('input[type="number"]:nth-of-type(3)')?.value || '50';
+                            const sliderAlign = comp.querySelector('.align-option.active')?.getAttribute('data-align') || 'center';
                             code += `  int ${id}_value = ${value};\n`;
                             code += `  auto ${id} = Slider("${sliderLabel}", &${id}_value, ${min}, ${max});\n`;
+                            if (sliderAlign === 'left') code += `  ${id} = ${id} | align_left;\n`;
+                            if (sliderAlign === 'right') code += `  ${id} = ${id} | align_right;\n`;
                             break;
                             
                         case 'toggle':
-                            const toggleLabel = comp.querySelector('.component-label').value || '开关';
-                            const isToggled = comp.querySelector('input[type="checkbox"]').checked;
+                            const toggleLabel = comp.querySelector('.component-label')?.value || '开关';
+                            const isToggled = comp.querySelector('input[type="checkbox"]')?.checked || false;
+                            const toggleAlign = comp.querySelector('.align-option.active')?.getAttribute('data-align') || 'center';
                             code += `  bool ${id}_value = ${isToggled ? "true" : "false"};\n`;
                             code += `  auto ${id} = Toggle("${toggleLabel}", &${id}_value);\n`;
+                            if (toggleAlign === 'left') code += `  ${id} = ${id} | align_left;\n`;
+                            if (toggleAlign === 'right') code += `  ${id} = ${id} | align_right;\n`;
                             break;
                             
                         case 'text':
-                            const textContent = comp.querySelector('textarea').value || '文本内容';
+                            const textContent = comp.querySelector('textarea')?.value || '文本内容';
+                            const textAlign = comp.querySelector('.align-option.active')?.getAttribute('data-align') || 'center';
                             code += `  auto ${id} = text("${textContent}");\n`;
+                            if (textAlign === 'left') code += `  ${id} = ${id} | align_left;\n`;
+                            if (textAlign === 'center') code += `  ${id} = ${id} | center;\n`;
+                            if (textAlign === 'right') code += `  ${id} = ${id} | align_right;\n`;
+                            break;
+                            
+                        case 'vcontainer':
+                            const vcontainerChildren = comp.querySelectorAll('.component');
+                            code += `  Elements ${id}_children;\n`;
+                            vcontainerChildren.forEach((child, idx) => {
+                                const childId = `child${idx+1}_${id}`;
+                                const childType = child.getAttribute('data-type');
+                                if (childType !== 'vcontainer' && childType !== 'hcontainer') {
+                                    code += `  ${id}_children.push_back(${childId}->Render());\n`;
+                                }
+                            });
+                            code += `  auto ${id} = vbox({\n`;
+                            vcontainerChildren.forEach((child, idx) => {
+                                const childId = `child${idx+1}_${id}`;
+                                code += `    ${childId}->Render(),\n`;
+                            });
+                            code += `  });\n`;
+                            break;
+                            
+                        case 'hcontainer':
+                            const hcontainerChildren = comp.querySelectorAll('.component');
+                            code += `  Elements ${id}_children;\n`;
+                            hcontainerChildren.forEach((child, idx) => {
+                                const childId = `child${idx+1}_${id}`;
+                                const childType = child.getAttribute('data-type');
+                                if (childType !== 'vcontainer' && childType !== 'hcontainer') {
+                                    code += `  ${id}_children.push_back(${childId}->Render());\n`;
+                                }
+                            });
+                            code += `  auto ${id} = hbox({\n`;
+                            hcontainerChildren.forEach((child, idx) => {
+                                const childId = `child${idx+1}_${id}`;
+                                code += `    ${childId}->Render(),\n`;
+                            });
+                            code += `  });\n`;
+                            break;
+                            
+                        case 'dropdown':
+                            const dropdownLabel = comp.querySelector('.component-label')?.value || '下拉菜单';
+                            const dropdownOptions = Array.from(comp.querySelectorAll('.option-input')).map(input => input.value || '选项');
+                            const dropdownAlign = comp.querySelector('.align-option.active')?.getAttribute('data-align') || 'center';
+                            code += `  int ${id}_selected = 0;\n`;
+                            code += `  std::vector<std::string> ${id}_options = {\n`;
+                            dropdownOptions.forEach(opt => code += `    "${opt}",\n`);
+                            code += `  };\n`;
+                            code += `  auto ${id} = Dropdown(&${id}_options, &${id}_selected);\n`;
+                            if (dropdownAlign === 'left') code += `  ${id} = ${id} | align_left;\n`;
+                            if (dropdownAlign === 'right') code += `  ${id} = ${id} | align_right;\n`;
+                            break;
+                            
+                        case 'list':
+                            const listItems = Array.from(comp.querySelectorAll('.option-input')).map(input => input.value || '列表项');
+                            const listAlign = comp.querySelector('.align-option.active')?.getAttribute('data-align') || 'center';
+                            code += `  auto ${id} = vbox({\n`;
+                            listItems.forEach(item => code += `    text("${item}") | border | flex,\n`);
+                            code += `  });\n`;
+                            if (listAlign === 'left') code += `  ${id} = ${id} | align_left;\n`;
+                            if (listAlign === 'center') code += `  ${id} = ${id} | center;\n`;
+                            if (listAlign === 'right') code += `  ${id} = ${id} | align_right;\n`;
+                            break;
+                            
+                        case 'progress':
+                            const progressValue = comp.querySelector('input[type="number"]:nth-of-type(1)')?.value || '45';
+                            const progressMax = comp.querySelector('input[type="number"]:nth-of-type(2)')?.value || '100';
+                            const progressAlign = comp.querySelector('.align-option.active')?.getAttribute('data-align') || 'center';
+                            code += `  int ${id}_value = ${progressValue};\n`;
+                            code += `  auto ${id} = gauge(${id}_value / ${progressMax}.0f);\n`;
+                            if (progressAlign === 'left') code += `  ${id} = ${id} | align_left;\n`;
+                            if (progressAlign === 'right') code += `  ${id} = ${id} | align_right;\n`;
+                            break;
+                            
+                        case 'separator':
+                            code += `  auto ${id} = separator();\n`;
                             break;
                     }
                 });
                 
                 // 生成布局
                 code += `\n  // 创建布局\n`;
-                if (layoutDirection === 'vertical') {
-                    code += `  auto layout = Container::Vertical({\n`;
-                } else {
-                    code += `  auto layout = Container::Horizontal({\n`;
-                }
+                code += `  auto layout = Container::Vertical({\n`;
                 
                 components.forEach((comp, index) => {
                     const id = `comp${index + 1}`;
-                    code += `    ${id},\n`;
+                    const type = comp.getAttribute('data-type');
+                    
+                    if (type !== 'text' && type !== 'separator') {
+                        code += `    ${id},\n`;
+                    }
                 });
                 
                 code += `  });\n\n`;
@@ -549,14 +1286,14 @@
                     const id = `comp${index + 1}`;
                     const type = comp.getAttribute('data-type');
                     
-                    if (type === 'text') {
-                        code += `      ${id} | center,\n`;
+                    if (type === 'text' || type === 'separator') {
+                        code += `      ${id},\n`;
                     } else {
-                        code += `      ${id}->Render(),\n`;
+                        code += `      ${id}->Render() | flex,\n`;
                     }
                 });
                 
-                code += `    }) | border | center;\n`;
+                code += `    }) | border | center | flex;\n`;
                 code += `  });\n\n`;
                 
                 // 主循环
